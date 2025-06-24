@@ -12,6 +12,12 @@ function initTelegram() {
         tg.ready();
         tg.expand();
         
+        // Отправляем событие открытия игры в бота
+        tg.sendData(JSON.stringify({
+            type: "open_game",
+            timestamp: Date.now()
+        }));
+        
         // Получение данных пользователя
         const user = tg.initDataUnsafe.user;
         if (user) {
