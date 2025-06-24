@@ -182,15 +182,17 @@ function renderFields() {
             const timeLeft = Math.max(0, field.growthTime - timePassed);
             const progress = 1 - (timeLeft / plant.growthTime);
             const scale = 0.3 + progress * 0.7;
+            const justPlanted = field.justPlanted;
 
             fieldEl.innerHTML = `
                 <div class="plant-container">
-                    <img src="sprites/${field.plant}.png" class="plant-sprite"
+                    <img src="sprites/${field.plant}.png" class="plant-sprite${justPlanted ? ' just-planted' : ''}"
                          style="transform: scale(${scale});">
                     <div class="timer-bubble">${timeLeft > 0 ? formatTime(timeLeft) : 'Готово!'}</div>
                 </div>
             `;
             fieldEl.onclick = timeLeft <= 0 ? () => harvestField(field.id) : null;
+            if (justPlanted) delete field.justPlanted;
         } else {
             fieldEl.innerHTML = '<div class="empty-text">Свободно</div>';
             fieldEl.onclick = () => openPlantModal(field.id);
@@ -247,6 +249,7 @@ function plantSeed(fieldId, plantType) {
         field.plant = plantType;
         field.plantedAt = Date.now();
         field.growthTime = plant.growthTime;
+        field.justPlanted = true;
         
         closeModal('plant-modal');
         renderFields();
