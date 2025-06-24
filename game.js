@@ -275,6 +275,14 @@ function harvestField(fieldId) {
         field.growthTime = null;
         renderFields();
         saveGame();
+        // harvest effect
+        const fieldEl = document.getElementById(`field-${fieldId}`);
+        if (fieldEl) {
+            const effect = document.createElement('div');
+            effect.className = 'harvest-effect';
+            fieldEl.appendChild(effect);
+            setTimeout(() => effect.remove(), 800);
+        }
         alert('Урожай собран!');
     }
 }
