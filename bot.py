@@ -14,7 +14,7 @@ markup.add(KeyboardButton("Открыть игру", web_app=WebAppInfo(WEBAPP_U
 def start(message):
     bot.send_message(
         message.chat.id,
-        "Привет! Нажми кнопку ниже, чтобы открыть игру TG Farm 👇",
+        "Привет! Добро пожаловать в TG Farm!\nНажми кнопку ниже, чтобы открыть игру 👇",
         reply_markup=markup
     )
 
@@ -25,4 +25,7 @@ def handle_web_app_data(message):
         f.write(f"{message.from_user.id}: {data}\n")
     print(f"Пользователь {message.from_user.id} открыл игру. Данные: {data}")
 
-bot.polling() 
+# Бот работает всегда в автономном режиме (polling)
+if __name__ == "__main__":
+    print("TG Farm Bot запущен и работает в автономном режиме.")
+    bot.polling(none_stop=True) 
