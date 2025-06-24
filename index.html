@@ -102,6 +102,65 @@
         .hidden {
             display: none;
         }
+        
+        /* Стили для магазина */
+        .shop-tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4caf50;
+        }
+        .shop-tab {
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .shop-tab.active {
+            background: #4caf50;
+            color: white;
+            border-radius: 5px 5px 0 0;
+        }
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .shop-item {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+        }
+        .shop-item-emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .shop-item-info {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .shop-item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .buy-btn {
+            padding: 5px 10px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
