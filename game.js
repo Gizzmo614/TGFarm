@@ -622,4 +622,64 @@ function getDefaultGameState() {
         animals: [],
         processingRecipes: {}
     };
+}
+
+// --- Серверное хранилище ---
+async function saveProgressToServer() {
+    const userId = getUserId();
+    if (!userId) return;
+    try {
+        await fetch('http://localhost:8080/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, game_state: gameState })
+        });
+    } catch (e) {
+        console.warn('Ошибка сохранения на сервере:', e);
+    }
+}
+
+async function loadProgressFromServer() {
+    const userId = getUserId();
+    if (!userId) return false;
+    try {
+        const res = await fetch(`http://localhost:8080/load?user_id=${userId}`);
+        const data = await res.json();
+        if (data.ok && data.game_state) {
+            gameState = data.game_state;
+            renderFields();
+            updateUI();
+            return true;
+        }
+    } catch (e) {
+        console.warn('Ошибка загрузки с сервера:', e);
+    }
+    return false;
+}
+
+function getUserId() {
+    // Для Telegram WebApp
+    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+        return Telegram.WebApp.initDataUnsafe.user.id;
+    }
+    // Для теста в браузере — localStorage
+    let id = localStorage.getItem('tgfarm_user_id');
+    if (!id) {
+        id = 'local_' + Math.random().toString(36).slice(2);
+        localStorage.setItem('tgfarm_user_id', id);
+    }
+    return id;
+}
+
+// --- Модифицируем saveGame и loadGame ---
+const oldSaveGame = saveGame;
+saveGame = function() {
+    oldSaveGame();
+    saveProgressToServer();
+}
+
+const oldLoadGame = loadGame;
+loadGame = async function() {
+    const loaded = await loadProgressFromServer();
+    if (!loaded) oldLoadGame();
 } 
