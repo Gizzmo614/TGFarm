@@ -57,6 +57,14 @@ const PLANTS = {
         growthTime: 600, 
         cost: 20,
         reward: { min: 35, max: 40 }
+    },
+    chicken: {
+        name: "Курица",
+        emoji: "🐔",
+        growthTime: 300, // 5 минут
+        cost: 30,
+        reward: { min: 10, max: 15 },
+        product: "🥚"
     }
 };
 
@@ -73,7 +81,9 @@ let gameState = {
     storage: {
         potato: 0,
         carrot: 0,
-        sunflower: 0
+        sunflower: 0,
+        chicken: 0,
+        egg: 0
     }
 };
 
@@ -183,11 +193,16 @@ function harvestField(fieldId) {
     const plant = PLANTS[field.plant];
     const timePassed = Math.floor((Date.now() - field.plantedAt) / 1000);
     if (field.plant && timePassed >= field.growthTime) {
-        gameState.storage[field.plant]++;
+        // Если это животное - добавляем продукт
+        if (PLANTS[field.plant]?.product) {
+            gameState.storage[field.plant]++; // Само животное
+            gameState.storage.egg += 3; // 3 яйца
+        } else {
+            gameState.storage[field.plant]++;
+        }
         field.plant = null;
         field.plantedAt = null;
         field.growthTime = null;
-        
         renderFields();
         saveGame();
         alert('Урожай собран!');
@@ -198,21 +213,26 @@ function harvestField(fieldId) {
 function openStorage() {
     const container = document.getElementById('storage-container');
     container.innerHTML = '';
-    
     Object.entries(gameState.storage).forEach(([key, count]) => {
         if (count > 0) {
-            const plant = PLANTS[key];
+            let display;
+            if (key === 'egg') {
+                display = `🥚 Яйца: ${count}`;
+            } else if (PLANTS[key]) {
+                const plant = PLANTS[key];
+                display = `${plant.emoji} ${plant.name}: ${count}`;
+            } else {
+                display = `${key}: ${count}`;
+            }
             const item = document.createElement('div');
             item.className = 'storage-item';
-            item.innerHTML = `${plant.emoji} ${plant.name}: ${count}`;
+            item.innerHTML = display;
             container.appendChild(item);
         }
     });
-    
     if (container.innerHTML === '') {
         container.innerHTML = '<p>Склад пуст</p>';
     }
-    
     document.getElementById('storage-modal').classList.remove('hidden');
 }
 
