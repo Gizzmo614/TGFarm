@@ -85,7 +85,9 @@ let gameState = {
         sunflower: 0,
         chicken: 0,
         egg: 0
-    }
+    },
+    animals: [],
+    processingRecipes: {}
 };
 
 // Конфигурация магазина
@@ -120,6 +122,9 @@ function initGame() {
     updateUI();
     setupEventListeners();
     setInterval(renderFields, 1000);
+    setInterval(() => {
+        checkAnimalProduction();
+    }, 60000); // Проверяем каждую минуту
 }
 
 // Генерация полей
@@ -439,7 +444,6 @@ function buyShopItem(id, category) {
                 };
                 break;
             case 'animal':
-                gameState.animals = gameState.animals || [];
                 gameState.animals.push({
                     type: item.id,
                     emoji: item.emoji,
@@ -496,4 +500,34 @@ function activateTool(effect) {
             if (value.includes('+')) gameState.rareFindChance += parseFloat(value.replace('%', '')) / 100;
             break;
     }
+}
+
+// Проверка производства животных
+function checkAnimalProduction() {
+    if (!gameState.animals) return;
+    const now = Date.now();
+    gameState.animals.forEach(animal => {
+        const timePassed = (now - animal.lastProduction) / 1000;
+        if (timePassed >= animal.timer) {
+            // Добавляем продукт
+            gameState.storage[animal.product] = (gameState.storage[animal.product] || 0) + 1;
+            animal.lastProduction = now;
+            saveGame();
+            alert(`Ваше животное ${animal.emoji} произвело ${animal.product}!`);
+        }
+    });
+}
+
+// Переработка продуктов
+function processItem(item) {
+    if (gameState.processingRecipes && gameState.processingRecipes[item]) {
+        const output = gameState.processingRecipes[item];
+        if (gameState.storage[item] > 0) {
+            gameState.storage[item]--;
+            gameState.storage[output] = (gameState.storage[output] || 0) + 1;
+            saveGame();
+            return true;
+        }
+    }
+    return false;
 } 
