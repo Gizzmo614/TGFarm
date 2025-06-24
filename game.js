@@ -118,6 +118,35 @@ const SHOP_ITEMS = {
     ]
 };
 
+// Объявление всех функций до initGame
+
+function setupEventListeners() {
+    console.log('setupEventListeners called');
+    // Кнопки
+    document.getElementById('plant-btn').addEventListener('click', () => {
+        const freeField = gameState.fields.find(f => !f.locked && !f.plant);
+        if (freeField) openPlantModal(freeField.id);
+        else alert('Нет свободных полей!');
+    });
+    document.getElementById('storage-btn').addEventListener('click', openStorage);
+    document.getElementById('sell-btn').addEventListener('click', sellAll);
+    document.getElementById('help-btn').addEventListener('click', sendHelp);
+    // Закрытие модалок
+    document.getElementById('close-plant-modal').addEventListener('click', () => closeModal('plant-modal'));
+    document.getElementById('close-storage-modal').addEventListener('click', () => closeModal('storage-modal'));
+    // Магазин
+    document.getElementById('shop-btn').addEventListener('click', openShop);
+    document.getElementById('close-shop-modal').addEventListener('click', () => closeModal('shop-modal'));
+    document.querySelectorAll('.shop-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const category = tab.dataset.category;
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderShopItems(category);
+        });
+    });
+}
+
 // Инициализация игры
 function initGame() {
     loadGame(); // СНАЧАЛА загружаем сохранённое состояние!
@@ -331,34 +360,6 @@ function unlockField(fieldId) {
     } else {
         alert('Недостаточно монет!');
     }
-}
-
-// Установка обработчиков событий
-function setupEventListeners() {
-    console.log('setupEventListeners called');
-    // Кнопки
-    document.getElementById('plant-btn').addEventListener('click', () => {
-        const freeField = gameState.fields.find(f => !f.locked && !f.plant);
-        if (freeField) openPlantModal(freeField.id);
-        else alert('Нет свободных полей!');
-    });
-    document.getElementById('storage-btn').addEventListener('click', openStorage);
-    document.getElementById('sell-btn').addEventListener('click', sellAll);
-    document.getElementById('help-btn').addEventListener('click', sendHelp);
-    // Закрытие модалок
-    document.getElementById('close-plant-modal').addEventListener('click', () => closeModal('plant-modal'));
-    document.getElementById('close-storage-modal').addEventListener('click', () => closeModal('storage-modal'));
-    // Магазин
-    document.getElementById('shop-btn').addEventListener('click', openShop);
-    document.getElementById('close-shop-modal').addEventListener('click', () => closeModal('shop-modal'));
-    document.querySelectorAll('.shop-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            const category = tab.dataset.category;
-            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            renderShopItems(category);
-        });
-    });
 }
 
 // Помощь другу
