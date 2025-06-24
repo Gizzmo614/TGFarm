@@ -73,12 +73,11 @@ let gameState = {
 
 // Инициализация игры
 function initGame() {
-    initTelegram(); // Инициализация Telegram
+    loadGame(); // СНАЧАЛА загружаем сохранённое состояние!
+    initTelegram();
     renderFields();
     updateUI();
     setupEventListeners();
-    loadGame();
-    // Для обновления таймеров на экране
     setInterval(renderFields, 1000);
 }
 
