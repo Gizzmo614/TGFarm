@@ -172,29 +172,27 @@ function renderFields() {
         
         if (field.locked) {
             fieldEl.innerHTML = `
-                <div>🔒</div>
-                <div>Открыть: 100₽</div>
+                <div class="lock-icon">🔒</div>
+                <div class="unlock-text">Открыть: 100₽</div>
             `;
             fieldEl.onclick = () => unlockField(field.id);
         } else if (field.plant) {
             const plant = PLANTS[field.plant];
             const timePassed = Math.floor((Date.now() - field.plantedAt) / 1000);
             const timeLeft = Math.max(0, field.growthTime - timePassed);
-            if (timeLeft <= 0) {
-                fieldEl.innerHTML = `
-                    <div class="plant">${plant.emoji}</div>
-                    <div class="timer">Готово!</div>
-                `;
-                fieldEl.onclick = () => harvestField(field.id);
-            } else {
-                fieldEl.innerHTML = `
-                    <div class="plant">${plant.emoji}</div>
-                    <div class="timer">${formatTime(timeLeft)}</div>
-                `;
-                fieldEl.onclick = null;
-            }
+            const progress = 1 - (timeLeft / plant.growthTime);
+            const scale = 0.3 + progress * 0.7;
+
+            fieldEl.innerHTML = `
+                <div class="plant-container">
+                    <img src="sprites/${field.plant}.png" class="plant-sprite"
+                         style="transform: scale(${scale});">
+                    <div class="timer-bubble">${timeLeft > 0 ? formatTime(timeLeft) : 'Готово!'}</div>
+                </div>
+            `;
+            fieldEl.onclick = timeLeft <= 0 ? () => harvestField(field.id) : null;
         } else {
-            fieldEl.innerHTML = '<div>Свободно</div>';
+            fieldEl.innerHTML = '<div class="empty-text">Свободно</div>';
             fieldEl.onclick = () => openPlantModal(field.id);
         }
         
