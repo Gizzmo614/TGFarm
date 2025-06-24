@@ -140,6 +140,24 @@
                 <button id="close-storage-modal">Закрыть</button>
             </div>
         </div>
+        
+        <!-- Модальное окно магазина -->
+        <div id="shop-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Магазин</h3>
+                <div class="shop-tabs">
+                    <button class="shop-tab active" data-category="seeds">Семена</button>
+                    <button class="shop-tab" data-category="animals">Животные</button>
+                    <button class="shop-tab" data-category="buildings">Постройки</button>
+                    <button class="shop-tab" data-category="decorations">Декорации</button>
+                    <button class="shop-tab" data-category="tools">Инструменты</button>
+                </div>
+                <div class="shop-items" id="shop-items-container">
+                    <!-- Товары будут загружаться сюда -->
+                </div>
+                <button id="close-shop-modal">Закрыть</button>
+            </div>
+        </div>
     </div>
 
     <script src="game.js"></script>
