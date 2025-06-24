@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TG Farm</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #e8f5e9;
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #4caf50;
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .field {
+            height: 120px;
+            background: #a5d6a7;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .plant {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .timer {
+            font-size: 14px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #4caf50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>Монеты: <span id="coins">50</span>₽</div>
+            <div>Уровень: <span id="level">1</span></div>
+        </div>
+        
+        <div class="fields" id="fields-container">
+            <!-- Поля будут генерироваться JS -->
+        </div>
+        
+        <div class="buttons">
+            <button id="plant-btn">Посадить</button>
+            <button id="storage-btn">Склад</button>
+            <button id="shop-btn">Магазин</button>
+            <button id="help-btn">Помощь</button>
+        </div>
+        
+        <!-- Модальное окно посадки -->
+        <div id="plant-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Выберите растение</h3>
+                <div id="plants-container"></div>
+                <button id="close-plant-modal">Закрыть</button>
+            </div>
+        </div>
+        
+        <!-- Модальное окно склада -->
+        <div id="storage-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Ваш склад</h3>
+                <div id="storage-container"></div>
+                <button id="sell-btn">Продать всё</button>
+                <button id="close-storage-modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html> 
