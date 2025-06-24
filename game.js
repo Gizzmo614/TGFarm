@@ -5,6 +5,10 @@
 let isTelegram = false;
 let tg = null;
 
+window.onerror = function(message, source, lineno, colno, error) {
+    console.error('JS Error:', message, 'at', source, lineno + ':' + colno, error);
+};
+
 function initTelegram() {
     if (window.Telegram && Telegram.WebApp) {
         isTelegram = true;
@@ -331,6 +335,7 @@ function unlockField(fieldId) {
 
 // Установка обработчиков событий
 function setupEventListeners() {
+    console.log('setupEventListeners called');
     // Кнопки
     document.getElementById('plant-btn').addEventListener('click', () => {
         const freeField = gameState.fields.find(f => !f.locked && !f.plant);
