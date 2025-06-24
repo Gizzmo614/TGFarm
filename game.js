@@ -461,6 +461,7 @@ function buyShopItem(id, category) {
                 };
                 break;
             case 'animal':
+                gameState.animals = gameState.animals || [];
                 gameState.animals.push({
                     type: item.id,
                     emoji: item.emoji,
