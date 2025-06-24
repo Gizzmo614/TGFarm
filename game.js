@@ -397,22 +397,34 @@ function saveGame() {
 
 // Загрузка игры
 function loadGame() {
-    const saved = localStorage.getItem('tgFarmGame');
-    if (saved) {
-        const parsed = JSON.parse(saved);
-        
-        // Миграция старых полей (если есть)
-        parsed.fields.forEach(field => {
-            if (field.plant && (!field.plantedAt || !field.growthTime)) {
-                field.plantedAt = Date.now();
-                field.growthTime = PLANTS[field.plant].growthTime;
-            }
-        });
-        
-        gameState = parsed;
-        renderFields();
-        updateUI();
+    try {
+        const saved = localStorage.getItem('tgFarmGame');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Миграция: добавляем недостающие поля
+            if (!parsed.fields) parsed.fields = [];
+            if (!parsed.storage) parsed.storage = {};
+            if (!parsed.animals) parsed.animals = [];
+            if (!parsed.decorations) parsed.decorations = [];
+            if (!parsed.coins) parsed.coins = 50;
+            if (!parsed.level) parsed.level = 1;
+            if (!parsed.experience) parsed.experience = 0;
+            // Миграция старых полей (если есть)
+            parsed.fields.forEach(field => {
+                if (field.plant && (!field.plantedAt || !field.growthTime)) {
+                    field.plantedAt = Date.now();
+                    field.growthTime = PLANTS[field.plant].growthTime;
+                }
+            });
+            gameState = parsed;
+        }
+    } catch (e) {
+        localStorage.removeItem('tgFarmGame');
+        showNotification('Сохранение повреждено и было сброшено!');
+        gameState = getDefaultGameState ? getDefaultGameState() : {};
     }
+    renderFields();
+    updateUI();
 }
 
 // Запуск игры при загрузке
