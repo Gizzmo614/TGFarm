@@ -59,10 +59,10 @@ let gameState = {
     coins: 50,
     level: 1,
     fields: [
-        { id: 0, plant: null, timer: null, intervalId: null },
-        { id: 1, plant: null, timer: null, intervalId: null },
-        { id: 2, plant: null, timer: null, intervalId: null, locked: true },
-        { id: 3, plant: null, timer: null, intervalId: null, locked: true }
+        { id: 0, plant: null, plantedAt: null, growthTime: null, locked: false },
+        { id: 1, plant: null, plantedAt: null, growthTime: null, locked: false },
+        { id: 2, plant: null, plantedAt: null, growthTime: null, locked: true },
+        { id: 3, plant: null, plantedAt: null, growthTime: null, locked: true }
     ],
     storage: {
         potato: 0,
@@ -78,6 +78,8 @@ function initGame() {
     updateUI();
     setupEventListeners();
     loadGame();
+    // Для обновления таймеров на экране
+    setInterval(renderFields, 1000);
 }
 
 // Генерация полей
@@ -98,11 +100,21 @@ function renderFields() {
             fieldEl.onclick = () => unlockField(field.id);
         } else if (field.plant) {
             const plant = PLANTS[field.plant];
-            fieldEl.innerHTML = `
-                <div class="plant">${plant.emoji}</div>
-                <div class="timer">${formatTime(field.timer)}</div>
-            `;
-            fieldEl.onclick = () => harvestField(field.id);
+            const timePassed = Math.floor((Date.now() - field.plantedAt) / 1000);
+            const timeLeft = Math.max(0, field.growthTime - timePassed);
+            if (timeLeft <= 0) {
+                fieldEl.innerHTML = `
+                    <div class="plant">${plant.emoji}</div>
+                    <div class="timer">Готово!</div>
+                `;
+                fieldEl.onclick = () => harvestField(field.id);
+            } else {
+                fieldEl.innerHTML = `
+                    <div class="plant">${plant.emoji}</div>
+                    <div class="timer">${formatTime(timeLeft)}</div>
+                `;
+                fieldEl.onclick = null;
+            }
         } else {
             fieldEl.innerHTML = '<div>Свободно</div>';
             fieldEl.onclick = () => openPlantModal(field.id);
@@ -148,19 +160,8 @@ function plantSeed(fieldId, plantType) {
     if (gameState.coins >= plant.cost) {
         gameState.coins -= plant.cost;
         field.plant = plantType;
-        field.timer = plant.growthTime;
-        
-        // Запуск таймера
-        field.intervalId = setInterval(() => {
-            field.timer--;
-            
-            if (field.timer <= 0) {
-                clearInterval(field.intervalId);
-                field.intervalId = null;
-            }
-            
-            renderFields();
-        }, 1000);
+        field.plantedAt = Date.now();
+        field.growthTime = plant.growthTime;
         
         closeModal('plant-modal');
         renderFields();
@@ -174,16 +175,13 @@ function plantSeed(fieldId, plantType) {
 // Сбор урожая
 function harvestField(fieldId) {
     const field = gameState.fields.find(f => f.id === fieldId);
-    
-    if (field.timer <= 0) {
+    const plant = PLANTS[field.plant];
+    const timePassed = Math.floor((Date.now() - field.plantedAt) / 1000);
+    if (field.plant && timePassed >= field.growthTime) {
         gameState.storage[field.plant]++;
         field.plant = null;
-        field.timer = null;
-        
-        if (field.intervalId) {
-            clearInterval(field.intervalId);
-            field.intervalId = null;
-        }
+        field.plantedAt = null;
+        field.growthTime = null;
         
         renderFields();
         saveGame();
@@ -298,23 +296,11 @@ function loadGame() {
     if (saved) {
         const parsed = JSON.parse(saved);
         
-        // Восстановление таймеров
+        // Миграция старых полей (если есть)
         parsed.fields.forEach(field => {
-            if (field.plant && field.timer > 0) {
-                const plant = PLANTS[field.plant];
-                const timePassed = plant.growthTime - field.timer;
-                
-                // Перезапуск таймера
-                field.intervalId = setInterval(() => {
-                    field.timer--;
-                    
-                    if (field.timer <= 0) {
-                        clearInterval(field.intervalId);
-                        field.intervalId = null;
-                    }
-                    
-                    renderFields();
-                }, 1000);
+            if (field.plant && (!field.plantedAt || !field.growthTime)) {
+                field.plantedAt = Date.now();
+                field.growthTime = PLANTS[field.plant].growthTime;
             }
         });
         
