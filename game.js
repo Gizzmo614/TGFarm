@@ -420,6 +420,9 @@ function loadGame() {
                 }
             });
             gameState = parsed;
+        } else {
+            showNotification('Прогресс не найден. На Android Telegram WebApp возможны сбросы сохранения. Рекомендуем использовать браузер или Telegram Desktop для стабильной игры.');
+            gameState = getDefaultGameState ? getDefaultGameState() : {};
         }
     } catch (e) {
         localStorage.removeItem('tgFarmGame');
