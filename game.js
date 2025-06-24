@@ -599,4 +599,27 @@ function processItem(item) {
         }
     }
     return false;
+}
+
+function getDefaultGameState() {
+    return {
+        coins: 50,
+        level: 1,
+        experience: 0,
+        fields: [
+            { id: 0, plant: null, plantedAt: null, growthTime: null, locked: false },
+            { id: 1, plant: null, plantedAt: null, growthTime: null, locked: false },
+            { id: 2, plant: null, plantedAt: null, growthTime: null, locked: true },
+            { id: 3, plant: null, plantedAt: null, growthTime: null, locked: true }
+        ],
+        storage: {
+            potato: 0,
+            carrot: 0,
+            sunflower: 0,
+            chicken: 0,
+            egg: 0
+        },
+        animals: [],
+        processingRecipes: {}
+    };
 } 
