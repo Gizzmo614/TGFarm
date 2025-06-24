@@ -520,18 +520,45 @@ function activateTool(effect) {
     }
 }
 
-// Проверка производства животных
+// Всплывающее уведомление
+function showNotification(message) {
+    let notif = document.getElementById('game-notification');
+    if (!notif) {
+        notif = document.createElement('div');
+        notif.id = 'game-notification';
+        notif.style.position = 'fixed';
+        notif.style.top = '20px';
+        notif.style.left = '50%';
+        notif.style.transform = 'translateX(-50%)';
+        notif.style.background = 'rgba(76,175,80,0.95)';
+        notif.style.color = 'white';
+        notif.style.padding = '15px 30px';
+        notif.style.borderRadius = '8px';
+        notif.style.fontSize = '18px';
+        notif.style.zIndex = 9999;
+        notif.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        document.body.appendChild(notif);
+    }
+    notif.textContent = message;
+    notif.style.display = 'block';
+    clearTimeout(notif._timeout);
+    notif._timeout = setTimeout(() => {
+        notif.style.display = 'none';
+    }, 2000);
+}
+
+// Проверка производства животных с offline-прогрессом
 function checkAnimalProduction() {
     if (!gameState.animals) return;
     const now = Date.now();
     gameState.animals.forEach(animal => {
         const timePassed = (now - animal.lastProduction) / 1000;
-        if (timePassed >= animal.timer) {
-            // Добавляем продукт
-            gameState.storage[animal.product] = (gameState.storage[animal.product] || 0) + 1;
-            animal.lastProduction = now;
+        const cycles = Math.floor(timePassed / animal.timer);
+        if (cycles > 0) {
+            gameState.storage[animal.product] = (gameState.storage[animal.product] || 0) + cycles;
+            animal.lastProduction += cycles * animal.timer * 1000;
             saveGame();
-            alert(`Ваше животное ${animal.emoji} произвело ${animal.product}!`);
+            showNotification(`Ваше животное ${animal.emoji} произвело ${animal.product} x${cycles}!`);
         }
     });
 }
