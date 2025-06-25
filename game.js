@@ -28,13 +28,18 @@ const FIELD_COUNT = 6;
 let fields = [];
 let coins = 50;
 
+// --- ХРАНИЛИЩЕ СОБРАННОГО УРОЖАЯ ---
+let storage = {};
+
 function saveGame() {
     localStorage.setItem('tgfarm_fields', JSON.stringify(fields));
     localStorage.setItem('tgfarm_coins', coins);
+    localStorage.setItem('tgfarm_storage', JSON.stringify(storage));
 }
 function loadGame() {
     fields = JSON.parse(localStorage.getItem('tgfarm_fields')) || Array(FIELD_COUNT).fill(null);
     coins = Number(localStorage.getItem('tgfarm_coins')) || 50;
+    storage = JSON.parse(localStorage.getItem('tgfarm_storage')) || {};
 }
 
 function renderFields() {
@@ -71,10 +76,10 @@ function onFieldClick(i) {
         if (timeLeft <= 0) {
             // Сбор урожая
             const reward = rand(plantObj.reward.min, plantObj.reward.max);
-            coins += reward;
+            if (!storage[plant.type]) storage[plant.type] = 0;
+            storage[plant.type] += reward;
             fields[i] = null;
-            showNotification(`Урожай собран! +${reward}₽`);
-            updateCoins();
+            showNotification(`Урожай собран! +${reward} ${plantObj.emoji}`);
             saveGame();
             renderFields();
         }
@@ -219,13 +224,35 @@ storageBtn.onclick = () => {
 closeStorageModal.onclick = () => storageModal.classList.add('hidden');
 function renderStorage() {
     const cont = document.getElementById('storage-container');
-    let items = {};
-    fields.forEach(plant => {
-        if (!plant) return;
-        if (!items[plant.type]) items[plant.type] = 0;
-        items[plant.type]++;
-    });
-    cont.innerHTML = Object.keys(PLANTS).map(type => `${PLANTS[type].emoji} ${PLANTS[type].name}: ${fields.filter(f=>f&&f.type===type).length}`).join('<br>') || 'Пусто';
+    let has = false;
+    cont.innerHTML = Object.keys(PLANTS).map(type => {
+        const count = storage[type] || 0;
+        if (count > 0) {
+            has = true;
+            return `${PLANTS[type].emoji} ${PLANTS[type].name}: ${count}`;
+        }
+        return '';
+    }).filter(Boolean).join('<br>') || 'Пусто';
+    // Кнопка "Продать всё"
+    document.getElementById('sell-btn').onclick = () => {
+        let total = 0;
+        Object.keys(PLANTS).forEach(type => {
+            const count = storage[type] || 0;
+            if (count > 0) {
+                total += count * PLANTS[type].cost;
+                storage[type] = 0;
+            }
+        });
+        if (total > 0) {
+            coins += total;
+            showNotification(`Всё продано! +${total}₽`);
+            saveGame();
+            updateCoins();
+            renderStorage();
+        } else {
+            showNotification('Нет урожая для продажи!');
+        }
+    };
 }
 // Магазин
 const shopBtn = document.getElementById('shop-btn');
