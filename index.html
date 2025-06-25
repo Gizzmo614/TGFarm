@@ -252,11 +252,14 @@
         </div>
         
         <div class="fields" id="fields-container">
-            <!-- Поля будут генерироваться JS -->
+            <!-- Поля для растений -->
         </div>
-        
+        <div class="fields" id="animal-fields-container">
+            <!-- Поля для животных -->
+        </div>
         <div class="buttons">
             <button id="plant-btn">Посадить</button>
+            <button id="animal-btn">Завести животное</button>
             <button id="storage-btn">Склад</button>
             <button id="shop-btn">Магазин</button>
             <button id="help-btn">Помощь</button>
@@ -296,6 +299,15 @@
                     <!-- Товары будут загружаться сюда -->
                 </div>
                 <button id="close-shop-modal">Закрыть</button>
+            </div>
+        </div>
+        
+        <!-- Модальное окно для животных -->
+        <div id="animal-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Выберите животное</h3>
+                <div id="animals-container"></div>
+                <button id="close-animal-modal">Закрыть</button>
             </div>
         </div>
     </div>

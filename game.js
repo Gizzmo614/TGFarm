@@ -83,6 +83,10 @@ let gameState = {
         { id: 2, plant: null, plantedAt: null, growthTime: null, locked: true },
         { id: 3, plant: null, plantedAt: null, growthTime: null, locked: true }
     ],
+    animalFields: [
+        { id: 0, animal: null, placedAt: null, productionTime: null, locked: false },
+        { id: 1, animal: null, placedAt: null, productionTime: null, locked: true }
+    ],
     storage: {
         potato: 0,
         carrot: 0,
@@ -131,6 +135,11 @@ function setupEventListeners() {
     document.getElementById('storage-btn').addEventListener('click', openStorage);
     document.getElementById('sell-btn').addEventListener('click', sellAll);
     document.getElementById('help-btn').addEventListener('click', sendHelp);
+    document.getElementById('animal-btn').addEventListener('click', () => {
+        const freeField = gameState.animalFields.find(f => !f.locked && !f.animal);
+        if (freeField) openAnimalModal(freeField.id);
+        else alert('Нет свободных загонов!');
+    });
     // Закрытие модалок
     document.getElementById('close-plant-modal').addEventListener('click', () => closeModal('plant-modal'));
     document.getElementById('close-storage-modal').addEventListener('click', () => closeModal('storage-modal'));
@@ -152,6 +161,7 @@ function initGame() {
     loadGame(); // СНАЧАЛА загружаем сохранённое состояние!
     initTelegram();
     renderFields();
+    renderAnimalFields();
     updateUI();
     setupEventListeners();
     setInterval(renderFields, 1000);
@@ -198,6 +208,35 @@ function renderFields() {
             fieldEl.onclick = () => openPlantModal(field.id);
         }
         
+        container.appendChild(fieldEl);
+    });
+}
+
+function renderAnimalFields() {
+    const container = document.getElementById('animal-fields-container');
+    container.innerHTML = '';
+    gameState.animalFields.forEach(field => {
+        const fieldEl = document.createElement('div');
+        fieldEl.className = 'field animal-field';
+        fieldEl.id = `animal-field-${field.id}`;
+        if (field.locked) {
+            fieldEl.innerHTML = `<div class="lock-icon">🔒</div><div class="unlock-text">Открыть: 200₽</div>`;
+            fieldEl.onclick = () => unlockAnimalField(field.id);
+        } else if (field.animal) {
+            const animal = SHOP_ITEMS.animals.find(a => a.id === field.animal);
+            const timePassed = Math.floor((Date.now() - field.placedAt) / 1000);
+            const timeLeft = Math.max(0, animal.productionTime - timePassed);
+            fieldEl.innerHTML = `
+                <div class="plant-container">
+                    <span class="plant-sprite">${animal.emoji}</span>
+                    <div class="timer-bubble">${timeLeft > 0 ? formatTime(timeLeft) : 'Готово!'}</div>
+                </div>
+            `;
+            fieldEl.onclick = timeLeft <= 0 ? () => collectAnimalProduct(field.id) : null;
+        } else {
+            fieldEl.innerHTML = '<div class="empty-text">Свободно</div>';
+            fieldEl.onclick = () => openAnimalModal(field.id);
+        }
         container.appendChild(fieldEl);
     });
 }
@@ -430,6 +469,7 @@ function loadGame() {
         gameState = getDefaultGameState ? getDefaultGameState() : {};
     }
     renderFields();
+    renderAnimalFields();
     updateUI();
 }
 
@@ -648,6 +688,7 @@ async function loadProgressFromServer() {
         if (data.ok && data.game_state) {
             gameState = data.game_state;
             renderFields();
+            renderAnimalFields();
             updateUI();
             return true;
         }
@@ -682,4 +723,60 @@ const oldLoadGame = loadGame;
 loadGame = async function() {
     const loaded = await loadProgressFromServer();
     if (!loaded) oldLoadGame();
+}
+
+function openAnimalModal(fieldId) {
+    // Показываем только животных из SHOP_ITEMS.animals
+    const container = document.getElementById('animals-container');
+    container.innerHTML = '';
+    SHOP_ITEMS.animals.forEach(animal => {
+        const btn = document.createElement('button');
+        btn.innerHTML = `${animal.emoji} ${animal.name} (${animal.price}₽)`;
+        btn.onclick = () => placeAnimal(fieldId, animal.id);
+        container.appendChild(btn);
+    });
+    document.getElementById('animal-modal').classList.remove('hidden');
+}
+
+function placeAnimal(fieldId, animalId) {
+    const field = gameState.animalFields.find(f => f.id === fieldId);
+    const animal = SHOP_ITEMS.animals.find(a => a.id === animalId);
+    if (gameState.coins >= animal.price) {
+        gameState.coins -= animal.price;
+        field.animal = animalId;
+        field.placedAt = Date.now();
+        field.productionTime = animal.productionTime;
+        closeModal('animal-modal');
+        renderAnimalFields();
+        updateUI();
+        saveGame();
+    } else {
+        alert('Недостаточно монет!');
+    }
+}
+
+function unlockAnimalField(fieldId) {
+    const field = gameState.animalFields.find(f => f.id === fieldId);
+    if (gameState.coins >= 200) {
+        gameState.coins -= 200;
+        field.locked = false;
+        renderAnimalFields();
+        updateUI();
+        saveGame();
+    } else {
+        alert('Недостаточно монет!');
+    }
+}
+
+function collectAnimalProduct(fieldId) {
+    const field = gameState.animalFields.find(f => f.id === fieldId);
+    const animal = SHOP_ITEMS.animals.find(a => a.id === field.animal);
+    if (field.animal && animal) {
+        gameState.storage[animal.product] = (gameState.storage[animal.product] || 0) + 1;
+        field.placedAt = Date.now();
+        renderAnimalFields();
+        updateUI();
+        saveGame();
+        showNotification(`Ваше животное ${animal.emoji} принесло ${animal.product}!`);
+    }
 } 
