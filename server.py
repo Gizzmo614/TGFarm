@@ -73,7 +73,6 @@ def check_and_notify_all_users():
                 plant_type = plant.get('type')
                 planted_at = plant.get('plantedAt')
                 if plant_type and planted_at is not None:
-                    # growthTime в секундах
                     growth_time = 0
                     if plant_type == 'potato':
                         growth_time = 60
@@ -82,7 +81,6 @@ def check_and_notify_all_users():
                     elif plant_type == 'sunflower':
                         growth_time = 600
                     if time.time() >= planted_at + growth_time:
-                        # Проверяем, не отправляли ли уже уведомление (флаг в сохранении)
                         if not game_state.get('notified_harvest_ready'):
                             try:
                                 bot.send_message(user_id, "🌾 Урожай на вашей ферме готов к сбору!")
@@ -91,10 +89,8 @@ def check_and_notify_all_users():
                             except Exception as e:
                                 print(f"Ошибка отправки уведомления {user_id}: {e}")
                         break
-    # Запускаем снова через 60 секунд
     threading.Timer(60, check_and_notify_all_users).start()
 
-# Запуск таймера при старте сервера
 check_and_notify_all_users()
 
 if __name__ == "__main__":

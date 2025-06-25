@@ -1,0 +1,16 @@
+{
+  "name": "tg-farm",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start-server": "node server.js",
+    "start-bot": "node bot.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "telegraf": "^4.12.2",
+    "node-fetch": "^2.6.7",
+    "dotenv": "^16.3.1"
+  }
+} 
