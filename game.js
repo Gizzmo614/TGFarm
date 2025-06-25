@@ -79,10 +79,23 @@ function onFieldClick(i) {
             if (!storage[plant.type]) storage[plant.type] = 0;
             storage[plant.type] += reward;
             fields[i] = null;
+            // Сброс флага уведомления на сервере
+            resetHarvestNotified();
             showNotification(`Урожай собран! +${reward} ${plantObj.emoji}`);
             saveGame();
             renderFields();
         }
+    }
+}
+
+function resetHarvestNotified() {
+    // Отправляем на сервер сброс флага notified_harvest_ready
+    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+        fetch('https://tgfarm-sqdm.onrender.com/reset_harvest_notified', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: Telegram.WebApp.initDataUnsafe.user.id })
+        });
     }
 }
 
