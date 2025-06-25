@@ -61,14 +61,6 @@ const PLANTS = {
         growthTime: 600, 
         cost: 20,
         reward: { min: 35, max: 40 }
-    },
-    chicken: {
-        name: "Курица",
-        emoji: "🐔",
-        growthTime: 300, // 5 минут
-        cost: 30,
-        reward: { min: 10, max: 15 },
-        product: "🥚"
     }
 };
 
