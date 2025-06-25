@@ -5,6 +5,7 @@ const { notifyAllUsers } = require('./bot');
 const { Telegraf } = require('telegraf');
 require('dotenv').config();
 const bot = new Telegraf(process.env.TOKEN);
+const fs = require('fs');
 
 // Health check endpoint (обязательно для Render)
 app.get('/health', (req, res) => {
@@ -64,6 +65,15 @@ app.post('/notify_harvest_ready', express.json(), async (req, res) => {
   } catch (error) {
     console.error('Ошибка отправки уведомления:', error);
     res.status(500).json({ error: 'Ошибка отправки уведомления' });
+  }
+});
+
+app.get('/debug-chat-ids', (req, res) => {
+  if (fs.existsSync('./userIds.json')) {
+    const ids = JSON.parse(fs.readFileSync('./userIds.json'));
+    res.json(ids);
+  } else {
+    res.json([]);
   }
 });
 
