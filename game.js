@@ -185,4 +185,56 @@ function updateBackground() {
     } else {
         body.style.backgroundSize = 'cover';
     }
-} 
+}
+
+// --- КНОПКИ И МОДАЛКИ ---
+// Склад
+const storageBtn = document.getElementById('storage-btn');
+const storageModal = document.getElementById('storage-modal');
+const closeStorageModal = document.getElementById('close-storage-modal');
+storageBtn.onclick = () => {
+    renderStorage();
+    storageModal.classList.remove('hidden');
+};
+closeStorageModal.onclick = () => storageModal.classList.add('hidden');
+function renderStorage() {
+    const cont = document.getElementById('storage-container');
+    let items = {};
+    fields.forEach(plant => {
+        if (!plant) return;
+        if (!items[plant.type]) items[plant.type] = 0;
+        items[plant.type]++;
+    });
+    cont.innerHTML = Object.keys(PLANTS).map(type => `${PLANTS[type].emoji} ${PLANTS[type].name}: ${fields.filter(f=>f&&f.type===type).length}`).join('<br>') || 'Пусто';
+}
+// Магазин
+const shopBtn = document.getElementById('shop-btn');
+const shopModal = document.getElementById('shop-modal');
+const closeShopModal = document.getElementById('close-shop-modal');
+shopBtn.onclick = () => {
+    renderShop();
+    shopModal.classList.remove('hidden');
+};
+closeShopModal.onclick = () => shopModal.classList.add('hidden');
+function renderShop() {
+    const cont = document.getElementById('shop-items-container');
+    cont.innerHTML = Object.entries(PLANTS).map(([type, plant]) => `<div class='shop-item'><div class='shop-item-emoji'>${plant.emoji}</div><div class='shop-item-name'>${plant.name}</div><div class='shop-item-info'>Цена: ${plant.cost}₽</div></div>`).join('');
+}
+// Животные (заглушка)
+const animalBtn = document.getElementById('animal-btn');
+const animalModal = document.getElementById('animal-modal');
+const closeAnimalModal = document.getElementById('close-animal-modal');
+animalBtn.onclick = () => {
+    renderAnimals();
+    animalModal.classList.remove('hidden');
+};
+closeAnimalModal.onclick = () => animalModal.classList.add('hidden');
+function renderAnimals() {
+    const cont = document.getElementById('animals-container');
+    cont.innerHTML = '<div>Скоро появятся животные!</div>';
+}
+// Помощь
+const helpBtn = document.getElementById('help-btn');
+helpBtn.onclick = () => {
+    showNotification('Посадите растение, дождитесь созревания и соберите урожай!');
+}; 
