@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const { notifyAllUsers } = require('./bot');
+const { Telegraf } = require('telegraf');
+require('dotenv').config();
+const bot = new Telegraf(process.env.TOKEN);
 
 // Health check endpoint (обязательно для Render)
 app.get('/health', (req, res) => {
@@ -48,6 +51,20 @@ app.post('/reset_harvest_notified', express.json(), (req, res) => {
 
   farms.get(farmId).notified = false;
   res.status(200).json({ status: 'success' });
+});
+
+app.post('/notify_harvest_ready', express.json(), async (req, res) => {
+  const { user_id } = req.body;
+  if (!user_id) {
+    return res.status(400).json({ error: 'user_id is required' });
+  }
+  try {
+    await bot.telegram.sendMessage(user_id, 'Ваш урожай созрел! Заберите его в игре 🌾');
+    res.status(200).json({ status: 'notified' });
+  } catch (error) {
+    console.error('Ошибка отправки уведомления:', error);
+    res.status(500).json({ error: 'Ошибка отправки уведомления' });
+  }
 });
 
 app.listen(PORT, () => {
