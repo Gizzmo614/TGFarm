@@ -7,10 +7,30 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: #e8f5e9;
+            /* background: #e8f5e9; */
             margin: 0;
             padding: 10px;
             text-align: center;
+            background-image: url('sprites/background_main.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            transition: background-image 0.5s;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                background-size: contain;
+            }
+        }
+        .responsive-bg {
+            background-image: url('sprites/background_main.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            transition: background-image 0.5s;
         }
         
         .container {

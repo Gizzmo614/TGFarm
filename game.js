@@ -22,3 +22,15 @@ const PLANTS = {
         reward: { min: 35, max: 40 }
     }
 }; 
+
+// Адаптивная смена фонового изображения
+function updateBackground() {
+    const body = document.body;
+    if (window.innerWidth < 600) {
+        body.style.backgroundSize = 'contain';
+    } else {
+        body.style.backgroundSize = 'cover';
+    }
+}
+window.addEventListener('resize', updateBackground);
+window.addEventListener('DOMContentLoaded', updateBackground); 
