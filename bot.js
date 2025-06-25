@@ -1,9 +1,11 @@
 const { Telegraf } = require('telegraf');
 const fetch = require('node-fetch');
 require('dotenv').config();
+const fs = require('fs');
 
 const TOKEN = process.env.TOKEN;
 const SERVER_URL = process.env.SERVER_URL;
+const USERS_FILE = './userIds.json';
 
 if (!TOKEN) {
   throw new Error('Не указан токен Telegram-бота (TOKEN)');
@@ -11,8 +13,38 @@ if (!TOKEN) {
 
 const bot = new Telegraf(TOKEN);
 
+function saveUserChatId(chatId) {
+  let ids = [];
+  if (fs.existsSync(USERS_FILE)) {
+    ids = JSON.parse(fs.readFileSync(USERS_FILE));
+  }
+  if (!ids.includes(chatId)) {
+    ids.push(chatId);
+    fs.writeFileSync(USERS_FILE, JSON.stringify(ids));
+  }
+}
+
+function getAllUserChatIds() {
+  if (fs.existsSync(USERS_FILE)) {
+    return JSON.parse(fs.readFileSync(USERS_FILE));
+  }
+  return [];
+}
+
+async function notifyAllUsers(message) {
+  const userChatIds = getAllUserChatIds();
+  for (const chatId of userChatIds) {
+    try {
+      await bot.telegram.sendMessage(chatId, message);
+    } catch (e) {
+      console.error(`Ошибка при отправке пользователю ${chatId}:`, e);
+    }
+  }
+}
+
 // /start команда
 bot.start((ctx) => {
+  saveUserChatId(ctx.chat.id);
   ctx.reply('Добро пожаловать в TG Farm! 🌾\nИспользуйте WebApp или управляйте фермой через Telegram.');
 });
 
@@ -38,4 +70,6 @@ bot.launch();
 
 // Грейсфул-шатдаун для Render
 process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM')); 
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
+module.exports = { notifyAllUsers }; 

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const { notifyAllUsers } = require('./bot');
 
 // Health check endpoint (обязательно для Render)
 app.get('/health', (req, res) => {
@@ -52,4 +53,8 @@ app.post('/reset_harvest_notified', express.json(), (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   startBackgroundTasks(); // Запускаем фоновые задачи
+  // Пример: уведомление всех пользователей через 10 секунд после запуска сервера
+  setTimeout(() => {
+    notifyAllUsers('Ваш урожай созрел! Заберите его в игре 🌾');
+  }, 10000);
 }); 
