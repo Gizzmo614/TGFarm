@@ -148,6 +148,15 @@ function showNotification(text) {
     setTimeout(()=>{ n.style.display = 'none'; }, 2500);
 }
 
+// --- Telegram уведомление о готовности урожая ---
+function notifyTelegramHarvestReady(telegramUserId) {
+    fetch('https://tgfarm-sqdm.onrender.com/notify_harvest_ready', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: telegramUserId })
+    });
+}
+
 // --- Проверка готовности урожая ---
 function checkHarvestReady() {
     let ready = false;
@@ -158,7 +167,18 @@ function checkHarvestReady() {
             if (timeLeft <= 0) ready = true;
         }
     });
-    if (ready) showNotification('Урожай готов к сбору!');
+    if (ready) {
+        showNotification('Урожай готов к сбору!');
+        if (!window._harvestNotified) {
+            window._harvestNotified = true;
+            // Получаем user_id из Telegram WebApp, если есть
+            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                notifyTelegramHarvestReady(Telegram.WebApp.initDataUnsafe.user.id);
+            }
+        }
+    } else {
+        window._harvestNotified = false;
+    }
 }
 
 // --- Инициализация ---
