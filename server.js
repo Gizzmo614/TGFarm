@@ -53,7 +53,19 @@ async function notifyAllUsers(message) {
 
 bot.start((ctx) => {
   saveUserChatId(ctx.chat.id);
-  ctx.reply('Добро пожаловать в TG Farm! 🌾\nИспользуйте WebApp или управляйте фермой через Telegram.');
+  ctx.reply('Добро пожаловать в TG Farm! 🌾\nИспользуйте WebApp или управляйте фермой через Telegram.', {
+    reply_markup: {
+      keyboard: [
+        [
+          {
+            text: 'Открыть игру',
+            web_app: { url: 'https://tgfarm-sqdm.onrender.com' }
+          }
+        ]
+      ],
+      resize_keyboard: true
+    }
+  });
 });
 
 bot.action(/harvest_(.+)/, async (ctx) => {
