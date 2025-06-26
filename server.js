@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const { notifyAllUsers } = require('./bot');
 const { Telegraf } = require('telegraf');
 require('dotenv').config();
 const fs = require('fs');
