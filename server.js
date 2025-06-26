@@ -23,7 +23,14 @@ function saveUserChatId(chatId) {
   }
   if (!ids.includes(chatId)) {
     ids.push(chatId);
-    fs.writeFileSync(USERS_FILE, JSON.stringify(ids));
+    try {
+      fs.writeFileSync(USERS_FILE, JSON.stringify(ids));
+      console.log('Добавлен chat_id:', chatId, 'Текущий список:', ids);
+    } catch (e) {
+      console.error('Ошибка при записи userIds.json:', e);
+    }
+  } else {
+    console.log('chat_id уже есть:', chatId);
   }
 }
 
