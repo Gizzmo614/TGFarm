@@ -59,7 +59,7 @@ bot.start((ctx) => {
         [
           {
             text: 'Открыть игру',
-            web_app: { url: 'https://tgfarm-sqdm.onrender.com' }
+            web_app: { url: 'https://gizzmo614.github.io/TGFarm/' }
           }
         ]
       ],
