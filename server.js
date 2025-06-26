@@ -141,8 +141,8 @@ app.post('/notify_harvest_ready', express.json(), async (req, res) => {
     return res.status(400).json({ error: 'user_id is required' });
   }
   try {
-    await notifyAllUsers('Урожай созрел у кого-то из игроков! Заберите урожай в игре 🌾');
-    res.status(200).json({ status: 'notified_all' });
+    await bot.telegram.sendMessage(user_id, 'Ваш урожай созрел! Заберите его в игре 🌾');
+    res.status(200).json({ status: 'notified' });
   } catch (error) {
     console.error('Ошибка отправки уведомления:', error);
     res.status(500).json({ error: 'Ошибка отправки уведомления' });
